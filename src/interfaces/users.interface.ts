@@ -3,6 +3,12 @@ export interface User {
   email: string;
   password: string;
   firstname: string;
-  lastName: string;
+  lastname: string;
   uniqueId: string;
+}
+
+export interface UserReponse {
+  email: string;
+  fullname: string;
+  accountNumber: string;
 }
