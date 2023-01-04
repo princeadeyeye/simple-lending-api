@@ -8,6 +8,11 @@ class UserService {
     return findAccount;
   }
 
+  public async findAccountsByAccountNumber(accountNumber: string): Promise<Account> {
+    const findAccount: Account = await Accounts.query().select().from('accounts').where('accountNumber', '=', accountNumber).first();
+    return findAccount;
+  }
+
   public async findAccountsByUserId(id: string): Promise<Account> {
     const findAccount: Account = await Accounts.query().select().from('accounts').where('userId', '=', id).first();
     return findAccount;
@@ -20,8 +25,6 @@ class UserService {
     const newBalance = account.accountBalance - amount;
     this.updateBalance(newBalance, userId);
     return newBalance;
-    // let message = `${amount} has been withdrawn successfully`
-    // return callback(null, message);
   }
 
   public async receive(userId: string, amount: number): Promise<number> {
@@ -30,21 +33,17 @@ class UserService {
     const newBalance = account.accountBalance + amount;
     this.updateBalance(newBalance, userId);
     return newBalance;
-    // let message = `${amount} has been withdrawn successfully`
-    // return callback(null, message);
   }
 
-  public async transfer(amount: number, userId: string, receiverId: string) {
+  public async transfer(amount: number, userId: string, accountNumber: string) {
     if (amount < 1) throw new HttpException(409, 'invalid amount entered');
     const account = await this.findAccountsByUserId(userId);
+    const reveiver = await this.findAccountsByAccountNumber(accountNumber);
     if (amount > account.accountBalance) throw new HttpException(409, 'insufficient funds');
-    await this.receive(receiverId, amount);
+    await this.receive(reveiver.userId, amount);
     const newBalance = account.accountBalance - amount;
     this.updateBalance(newBalance, userId);
     return newBalance;
-    // this.accountBalance -= amount;
-    // let message = `${amount} has been transfered successfully`
-    // return callback(null, message);
   }
 
   public async updateBalance(newBalance: number, userId: string): Promise<number> {

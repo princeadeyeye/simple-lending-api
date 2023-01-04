@@ -73,6 +73,10 @@ class AuthService {
   public createCookie(tokenData: TokenData): string {
     return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn};`;
   }
+  public checkAuthorization(tokenUserId: string, userId: string): void {
+    const authorized = tokenUserId === userId;
+    if (!authorized) throw new HttpException(401, "User doesn't exist");
+  }
 }
 
 export default AuthService;
