@@ -7,6 +7,7 @@ import { DataStoredInToken, LoginResponseData, TokenData } from '@interfaces/aut
 import { User, UserReponse } from '@interfaces/users.interface';
 import { Users } from '@models/users.model';
 import { Accounts } from '@models/accounts.model';
+import { Account } from '@interfaces/accounts.interface';
 import { generateAccountNumber, isEmpty } from '@utils/util';
 import { v4 as uuid } from 'uuid';
 
@@ -18,25 +19,13 @@ class AuthService {
     if (findUser) throw new HttpException(409, `This email ${userData.email} already exists`);
 
     const userId = uuid();
-    let accountNumber = null;
+    let accountNumber: string = null;
     const hashedPassword = await hash(userData.password, 10);
     const createUserData: User = await Users.query()
       .insert({ ...userData, password: hashedPassword, uniqueId: userId })
       .into('users');
     if (createUserData) {
-      accountNumber = generateAccountNumber().toString();
-      const createdAt = new Date();
-      const updatedAt = new Date();
-      await Accounts.query()
-        .insert({
-          userId,
-          accountNumber,
-          createdAt,
-          updatedAt,
-          accountEmail: userData.email,
-          accountName: `${userData.lastname} ${userData.firstname}`,
-        })
-        .into('accounts');
+      accountNumber = await this.createAccount(createUserData);
     }
     const data: UserReponse = {
       email: createUserData.email,
@@ -87,9 +76,32 @@ class AuthService {
   public createCookie(tokenData: TokenData): string {
     return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn};`;
   }
-  public checkAuthorization(tokenUserId: string, userId: string): void {
+  public checkAuthorization(tokenUserId: string, userId: string): boolean {
     const authorized = tokenUserId === userId;
-    if (!authorized) throw new HttpException(401, "User doesn't exist");
+    return authorized;
+  }
+  public async createAccount(userData: User): Promise<string> {
+    const findUser: Account = await Accounts.query().select().from('accounts').where('accountEmail', '=', userData.email).first();
+    if (findUser) {
+      await Users.query().delete().where('id', '=', userData.id).into('users');
+      throw new HttpException(409, `This email ${userData.email} already exists`);
+    }
+
+    const accountNumber = generateAccountNumber().toString();
+    const createdAt = new Date();
+    const updatedAt = new Date();
+
+    await Accounts.query()
+      .insert({
+        userId: userData.uniqueId,
+        accountNumber,
+        createdAt,
+        updatedAt,
+        accountEmail: userData.email,
+        accountName: `${userData.lastname} ${userData.firstname}`,
+      })
+      .into('accounts');
+    return accountNumber;
   }
 }
 
