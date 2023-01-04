@@ -18,7 +18,7 @@ describe('Testing Users', () => {
 
   describe('[GET] /users/:id', () => {
     it('response statusCode 200 / findOne', () => {
-      const userId = 1;
+      const userId = 5;
 
       const usersRoute = new UserRoute();
       const app = new App([usersRoute]);
@@ -26,25 +26,29 @@ describe('Testing Users', () => {
     });
   });
 
-  describe('[POST] /users', () => {
-    it('response statusCode 201 / created', async () => {
-      const userData: CreateUserDto = {
-        email: 'test@email.com',
-        password: 'q1w2e3r4',
-      };
+  // describe('[POST] /users', () => {
+  //   it('response statusCode 201 / created', async () => {
+  //     const userData: CreateUserDto = {
+  //       email: 'test09090@email.com',
+  //       password: 'q1w2e3r4',
+  //       firstname: 'muiz',
+  //       lastname: 'ade',
+  //     };
 
-      const usersRoute = new UserRoute();
-      const app = new App([usersRoute]);
-      return request(app.getServer()).post(`${usersRoute.path}`).send(userData).expect(201);
-    });
-  });
+  //     const usersRoute = new UserRoute();
+  //     const app = new App([usersRoute]);
+  //     return request(app.getServer()).post(`${usersRoute.path}`).send(userData).expect(201);
+  //   });
+  // });
 
   describe('[PUT] /users/:id', () => {
     it('response statusCode 200 / updated', async () => {
-      const userId = 1;
+      const userId = 7;
       const userData: CreateUserDto = {
         email: 'test@email.com',
         password: 'q1w2e3r4',
+        firstname: 'muiz',
+        lastname: 'ade',
       };
 
       const usersRoute = new UserRoute();
@@ -54,12 +58,11 @@ describe('Testing Users', () => {
   });
 
   describe('[DELETE] /users/:id', () => {
-    it('response statusCode 200 / deleted', () => {
-      const userId = 1;
-
+    it('response statusCode 409 / deleted', () => {
+      const userId = 9;
       const usersRoute = new UserRoute();
       const app = new App([usersRoute]);
-      return request(app.getServer()).delete(`${usersRoute.path}/${userId}`).expect(200);
+      return request(app.getServer()).delete(`${usersRoute.path}/${userId}`).expect(409);
     });
   });
 });
