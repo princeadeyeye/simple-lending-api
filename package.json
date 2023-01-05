@@ -9,7 +9,7 @@
     "node" : "16.14.0"
   },
   "scripts": {
-    "start": "npm run build && cross-env NODE_ENV=production node dist/server.js",
+    "start": "npm run build:tsc && node dist/server.js",
     "dev": "cross-env NODE_ENV=development nodemon",
     "build": "swc src -d dist --source-maps --copy-files",
     "build:tsc": "tsc && tsc-alias",
@@ -45,12 +45,12 @@
     "swagger-jsdoc": "^6.2.1",
     "swagger-ui-express": "^4.5.0",
     "winston": "^3.8.1",
-    "winston-daily-rotate-file": "^4.7.1",
-    "@swc/cli": "^0.1.57",
-    "@swc/core": "^1.2.220",
-    "cross-env": "^7.0.3"
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
+    "@swc/cli": "^0.1.57",
+    "@swc/core": "^1.2.220",
+    "cross-env": "^7.0.3",
     "@types/bcrypt": "^5.0.0",
     "@types/compression": "^1.7.2",
     "@types/cookie-parser": "^1.4.3",
