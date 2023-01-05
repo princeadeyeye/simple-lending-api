@@ -2,7 +2,7 @@ import request from 'supertest';
 import App from '@/app';
 import { CreateUserDto, LoginDto } from '@dtos/users.dto';
 import AuthRoute from '@routes/auth.route';
-import { generateAccountNumber, isEmpty } from '@utils/util';
+import { generateAccountNumber } from '@utils/util';
 
 const accountNumber = generateAccountNumber().toString();
 let userId = null;
@@ -12,7 +12,7 @@ afterAll(async () => {
 
 describe('Testing Auth', () => {
   describe('[POST] /signup', () => {
-    it('response should have the Create userData', () => {
+    it('response should have the Create userData', async () => {
       const userData: CreateUserDto = {
         email: `test${accountNumber}@email.com`,
         password: 'q1w2e3r4',
@@ -22,7 +22,7 @@ describe('Testing Auth', () => {
 
       const authRoute = new AuthRoute();
       const app = new App([authRoute]);
-      return request(app.getServer()).post('/signup').send(userData).expect(201);
+      return await request(app.getServer()).post('/signup').send(userData).expect(201);
     });
   });
 
@@ -35,22 +35,10 @@ describe('Testing Auth', () => {
 
       const authRoute = new AuthRoute();
       const app = new App([authRoute]);
-      return request(app.getServer())
+      return await request(app.getServer())
         .post('/login')
         .send(userData)
         .expect('Set-Cookie', /^Authorization=.+/);
     });
   });
-
-  // error: StatusCode : 404, Message : Authentication token missing
-  // describe('[POST] /logout', () => {
-  //   it('logout Set-Cookie Authorization=; Max-age=0', () => {
-  //     const authRoute = new AuthRoute();
-  //     const app = new App([authRoute]);
-
-  //     return request(app.getServer())
-  //       .post('/logout')
-  //       .expect('Set-Cookie', /^Authorization=\;/);
-  //   });
-  // });
 });
