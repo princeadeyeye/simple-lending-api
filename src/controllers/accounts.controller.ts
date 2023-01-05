@@ -16,7 +16,9 @@ class AccountController {
       if (!account) return res.status(409).json({ status: 401, error: true, message: `${email} cannot deposit` });
       const isAuthorized = this.authService.checkAuthorization(user.uniqueId, account.userId);
       if (!isAuthorized) return res.status(401).json({ status: 401, error: true, message: `Authorization failed, ${email} cannot withdraw` });
-      await this.accountService.receive(account.userId, amount);
+      const transactionObject = this.accountService.createTransactionObject(account.userId, amount, 'DEPOSIT');
+      const transactionId = await this.accountService.createAccountsLogs(transactionObject);
+      await this.accountService.receive(account.userId, amount, transactionId);
       return res.status(201).json({ status: 201, error: false, message: `${amount} has been deposited successfully` });
     } catch (error) {
       next(error);
@@ -33,7 +35,11 @@ class AccountController {
       if (!isAuthorized) return res.status(401).json({ status: 401, error: true, message: `Authorization failed, ${email} cannot withdraw` });
       const receiverAccountNumber = req.body.accountNumber;
       const amount = parseFloat(req.body.amount);
-      const transferResponse = await this.accountService.transfer(amount, user.uniqueId, receiverAccountNumber);
+      const reveiver = await this.accountService.findAccountsByAccountNumber(receiverAccountNumber);
+      if (!reveiver) return res.status(409).json({ status: 409, error: true, data: null, message: `Wrong Account number` });
+      const transactionObject = this.accountService.createTransactionObject(account.userId, amount, 'TRANSFER', reveiver.userId);
+      const transactionId = await this.accountService.createAccountsLogs(transactionObject);
+      const transferResponse = await this.accountService.transfer(amount, user.uniqueId, reveiver.userId, transactionId);
       return res.status(transferResponse.status).json(transferResponse);
     } catch (error) {
       next(error);
@@ -49,7 +55,9 @@ class AccountController {
       const isAuthorized = this.authService.checkAuthorization(user.uniqueId, account.userId);
       if (!isAuthorized) return res.status(401).json({ status: 401, error: true, message: `Authorization failed, ${email} cannot withdraw` });
       const amount = parseFloat(req.body.amount);
-      const withdrawResponse = await this.accountService.withdraw(user.uniqueId, amount);
+      const transactionObject = this.accountService.createTransactionObject(account.userId, amount, 'WITHDRAW');
+      const transactionId = await this.accountService.createAccountsLogs(transactionObject);
+      const withdrawResponse = await this.accountService.withdraw(user.uniqueId, amount, transactionId);
       res.status(withdrawResponse.status).json(withdrawResponse);
     } catch (error) {
       next(error);
