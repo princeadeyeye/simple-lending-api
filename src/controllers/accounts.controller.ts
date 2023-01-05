@@ -17,7 +17,7 @@ class AccountController {
       const isAuthorized = this.authService.checkAuthorization(user.uniqueId, account.userId);
       if (!isAuthorized) return res.status(401).json({ status: 401, error: true, message: `Authorization failed, ${email} cannot withdraw` });
       await this.accountService.receive(account.userId, amount);
-      return res.json({ status: 201, error: false, message: `${amount} has been deposited successfully` });
+      return res.status(201).json({ status: 201, error: false, message: `${amount} has been deposited successfully` });
     } catch (error) {
       next(error);
     }
