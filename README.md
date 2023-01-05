@@ -9,7 +9,7 @@ It has the following functionalities
 
 ### ER diagram
 
-![](./public/uploads/er-diagram.png)
+![](./public/er-diagram.png)
 
 
 

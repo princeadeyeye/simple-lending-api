@@ -5,7 +5,6 @@ import AuthRoute from '@routes/auth.route';
 import { generateAccountNumber } from '@utils/util';
 
 const accountNumber = generateAccountNumber().toString();
-let userId = null;
 afterAll(async () => {
   await new Promise<void>(resolve => setTimeout(() => resolve(), 500));
 });
