@@ -7,7 +7,7 @@ import { generateAccountNumber } from '@utils/util';
 const accountNumber = generateAccountNumber().toString();
 let userId = null;
 afterAll(async () => {
-  await new Promise<void>(resolve => setTimeout(() => resolve(), 500));
+  await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
 });
 
 describe('Testing Auth', () => {
